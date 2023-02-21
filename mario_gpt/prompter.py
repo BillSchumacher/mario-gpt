@@ -102,10 +102,14 @@ class Prompter:
 
     def elevation_prompt(self, flattened_level: str, level: str):
         top_levels = level[:6]  # elevation 8 and up
-        for t in top_levels:
-            if "X" in t or "<" in t or ">" in t:
-                return "high elevation", "high"
-        return "low elevation", "low"
+        return next(
+            (
+                ("high elevation", "high")
+                for t in top_levels
+                if "X" in t or "<" in t or ">" in t
+            ),
+            ("low elevation", "low"),
+        )
 
     def output_hidden(self, prompt: str, device: torch.device = torch.device("cpu")):
         # Reducing along the first dimension to get a 768 dimensional array
@@ -131,9 +135,12 @@ class Prompter:
             enemy_counts.append(enemy_count)
             pipe_counts.append(pipe_count)
             block_counts.append(block_count)
-        d = {"enemy": {}, "pipe": {}, "block": {}}
+        d = {
+            "pipe": {},
+            "block": {},
+            "enemy": stats.mstats.mquantiles(enemy_counts, [0.33, 0.66, 0.95]),
+        }
 
-        d["enemy"] = stats.mstats.mquantiles(enemy_counts, [0.33, 0.66, 0.95])
         d["pipe"] = stats.mstats.mquantiles(pipe_counts, [0.33, 0.66, 0.95])
         d["block"] = stats.mstats.mquantiles(block_counts, [0.33, 0.66, 0.95])
         return d

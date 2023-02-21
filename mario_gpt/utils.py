@@ -12,9 +12,7 @@ TILE_DIR = os.path.join(pt, "data", "tiles")
 
 def trim_level(level):
     mod = level.shape[-1] % 14
-    if mod > 0:
-        return level[:, :-mod]
-    return level
+    return level[:, :-mod] if mod > 0 else level
 
 
 def characterize(str_lists):
@@ -40,10 +38,7 @@ def view_level(level_tokens, tokenizer, flatten=False):
 
 def is_flying_enemy(array, row, col):
     num_rows = array.shape[0]
-    if row == num_rows - 1:
-        return False
-    below = array[row + 1][col]
-    return below == "-"
+    return False if row == num_rows - 1 else array[row + 1][col] == "-"
 
 
 def char_array_to_image(array, chars2pngs, target_size=None):

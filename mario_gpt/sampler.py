@@ -62,10 +62,7 @@ class SampleOutput:
             sample_predictions_str = None
             sample_predictions_img = None
 
-        prompt = None
-        if prompter is not None:
-            prompt = prompter(level_tensor)[0]
-
+        prompt = prompter(level_tensor)[0] if prompter is not None else None
         return SampleOutput(
             level,
             prompt,
@@ -209,10 +206,7 @@ class GPTSampler:
                 self.device
             )  # b x 1 x hidden_dim
             encoder_hidden_states = encoder_hidden_states.view(seed.shape[0], 1, -1)
-            if not self.use_tqdm:
-                bar = np.arange(num_steps)
-            else:
-                bar = tqdm(np.arange(num_steps))
+            bar = tqdm(np.arange(num_steps)) if self.use_tqdm else np.arange(num_steps)
             with torch.no_grad():
                 for i in bar:
                     inp = out_tensor * 1
@@ -240,9 +234,7 @@ class GPTSampler:
             self.mario_lm.prompter,
         )
         self.mario_lm.lm.train()
-        if return_tensor:
-            return sample_out, out_tensor
-        return sample_out
+        return (sample_out, out_tensor) if return_tensor else sample_out
 
     def __call__(self, *args, **kwargs):
         return self.sample(*args, **kwargs)
