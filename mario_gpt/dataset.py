@@ -129,10 +129,9 @@ class MarioDataset(Dataset):
 
     def __str__(self):
         str_list = characterize(self.tokenizer.batch_decode(self.x["input_ids"]))
-        string = "\n".join(
+        return "\n".join(
             join_list_of_list(flip_and_transpose(np.array(str_list), True))
         )
-        return string
 
     def generate_mask(self, mask_len: int, batch_size: int = 1):
         mask_token = self.tokenizer("<mask>").input_ids[1]
